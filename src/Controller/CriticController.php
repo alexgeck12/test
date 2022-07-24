@@ -15,6 +15,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CriticController extends AbstractController
 {
 	private CriticRepository $criticRepository;
+	private ValidatorInterface $validator;
 
 	public function __construct(CriticRepository $criticRepository, ValidatorInterface $validator)
 	{

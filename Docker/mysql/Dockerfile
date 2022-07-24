@@ -1,4 +1,5 @@
-FROM postgres:14-alpine
-ENV POSTGRES_USER=personalarea
-ENV POSTGRES_PASSWORD=personalarea
-ENV POSTGRES_DB=personalarea
+FROM mysql:latest
+ENV MYSQL_ROOT_PASSWORD=root
+ENV MYSQL_DATABASE=citrus
+ENV MYSQL_USER=citrus
+ENV MYSQL_PASSWORD=citrus

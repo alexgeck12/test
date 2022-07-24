@@ -39,6 +39,15 @@ class CriticRepository extends ServiceEntityRepository
         }
     }
 
+	public function update(Critic $entity, bool $flush = false): void
+	{
+		$this->getEntityManager()->persist($entity);
+
+		if ($flush) {
+			$this->getEntityManager()->flush();
+		}
+	}
+
 //    /**
 //     * @return Critic[] Returns an array of Critic objects
 //     */

@@ -39,6 +39,15 @@ class ReviewRepository extends ServiceEntityRepository
         }
     }
 
+	public function update(Review $entity, bool $flush = false): void
+	{
+		$this->getEntityManager()->persist($entity);
+
+		if ($flush) {
+			$this->getEntityManager()->flush();
+		}
+	}
+
 //    /**
 //     * @return Review[] Returns an array of Review objects
 //     */

@@ -29,3 +29,18 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    admin.critic:
+        class: App\Admin\CriticAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Critic, controller: App\Controller\CriticAdminController, manager_type: orm, group: Movie Reviews, label: Critic }
+
+    admin.movie:
+        class: App\Admin\MovieAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Movie, controller: App\Controller\MovieAdminController, manager_type: orm, group: Movie Reviews, label: Movie }
+
+    admin.review:
+        class: App\Admin\ReviewAdmin
+        tags:
+            - { name: sonata.admin, model_class: App\Entity\Review, controller: App\Controller\ReviewAdminController, manager_type: orm, group: Movie Reviews, label: Review }

@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Movie;
-use App\Repository\movieRepository;
+use App\Entity\Review;
+use App\Repository\ReviewRepository;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,86 +12,96 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class MovieController extends AbstractController
+class ReviewController extends AbstractController
 {
-	private movieRepository $movieRepository;
+	private ReviewRepository $reviewRepository;
+	private ValidatorInterface $validator;
 
-	public function __construct(movieRepository $movieRepository, ValidatorInterface $validator)
+	public function __construct(ReviewRepository $reviewRepository, ValidatorInterface $validator)
 	{
-		$this->movieRepository = $movieRepository;
+		$this->reviewRepository = $reviewRepository;
 		$this->validator = $validator;
 	}
 	
-    #[Route('/movies/', name: 'add_movie', methods: 'POST')]
+    #[Route('/reviews/', name: 'add_review', methods: 'POST')]
     public function add(Request $request): JsonResponse
     {
 		$data = json_decode($request->getContent(), true);
 
-		$movie = new Movie();
-		$movie->setName($data['name']);
+		$review = new Review();
+		$review->setName($data['name']);
+		$review->setSummary($data['summery']);
+		$review->setMpaaRating($data['mpaa_rating']);
+		$review->setPublicationDate(new \DateTime($data['publication_date']));
 
-		$errors = $this->validator->validate($movie);
+		$errors = $this->validator->validate($review);
 		if (count($errors) > 0) {
 			$errorsString = (string) $errors;
 			return new JsonResponse(['status' => $errorsString], Response::HTTP_BAD_REQUEST);
 		}
 
-		$this->movieRepository->add($movie, true);
+		$this->reviewRepository->add($review, true);
 
-		return new JsonResponse(['status' => 'Movie created!'], Response::HTTP_CREATED);
+		return new JsonResponse(['status' => 'Review created!'], Response::HTTP_CREATED);
     }
 
-	#[Route('/movies/{id}/', name: 'get_movie', methods: 'GET')]
+	#[Route('/reviews/{id}/', name: 'get_review', methods: 'GET')]
 	public function get($id): JsonResponse
 	{
-		$movie = $this->movieRepository->findOneBy(['id' => $id]);
+		$review = $this->reviewRepository->findOneBy(['id' => $id]);
 
-		if (!empty($movie)) {
+		if (!empty($review)) {
 			$data = [
-				'id' => $movie->getId(),
-				'name' => $movie->getName(),
+				'id' => $review->getId(),
+				'name' => $review->getName(),
+				'summery' => $review->getSummary(),
+				'mpaa_rating' => $review->getMpaaRating(),
+				'publication_date' => $review->getPublicationDate(),
 			];
 			return new JsonResponse($data, Response::HTTP_OK);
 		}
 
-		return new JsonResponse(['status' => 'Movie not found'], Response::HTTP_OK);
+		return new JsonResponse(['status' => 'Review not found'], Response::HTTP_OK);
 	}
 
-	#[Route('/movies/{id}/update', name: 'update_movie', methods: 'PUT')]
+	#[Route('/reviews/{id}/update', name: 'update_review', methods: 'PUT')]
 	public function update(Request $request, $id): JsonResponse
 	{
-		$movie = $this->movieRepository->findOneBy(['id' => $id]);
+		$review = $this->reviewRepository->findOneBy(['id' => $id]);
 
-		if (empty($movie)) {
-			return new JsonResponse(['status' => 'Movie not found'], Response::HTTP_OK);
+		if (empty($review)) {
+			return new JsonResponse(['status' => 'Review not found'], Response::HTTP_OK);
 		}
 
 		$data = json_decode($request->getContent(), true);
 
-		$movie->setName($data['name']);
+		$review->setName($data['name']);
+		$review->setSummary($data['summery']);
+		$review->setMpaaRating($data['mpaa_rating']);
+		$review->setPublicationDate(new \DateTime($data['publication_date']));
 
-		$errors = $this->validator->validate($movie);
+		$errors = $this->validator->validate($review);
 		if (count($errors) > 0) {
 			$errorsString = (string) $errors;
 			return new JsonResponse(['status' => $errorsString], Response::HTTP_BAD_REQUEST);
 		}
 
-		$this->movieRepository->update($movie, true);
+		$this->reviewRepository->update($review, true);
 
-		return new JsonResponse(['status' => 'Movie updated!'], Response::HTTP_CREATED);
+		return new JsonResponse(['status' => 'Review updated!'], Response::HTTP_CREATED);
 	}
 
-	#[Route('/movies/{id}/', name: 'delete_movie', methods: 'DELETE')]
+	#[Route('/reviews/{id}/', name: 'delete_review', methods: 'DELETE')]
 	public function delete($id): JsonResponse
 	{
-		$movie = $this->movieRepository->findOneBy(['id' => $id]);
+		$review = $this->reviewRepository->findOneBy(['id' => $id]);
 
-		if (empty($movie)) {
-			return new JsonResponse(['status' => 'Movie not found'], Response::HTTP_OK);
+		if (empty($review)) {
+			return new JsonResponse(['status' => 'Review not found'], Response::HTTP_OK);
 		}
 
-		$this->movieRepository->remove($movie, true);
+		$this->reviewRepository->remove($review, true);
 
-		return new JsonResponse(['status' => 'Movie deleted!'], Response::HTTP_CREATED);
+		return new JsonResponse(['status' => 'Review deleted!'], Response::HTTP_CREATED);
 	}
 }

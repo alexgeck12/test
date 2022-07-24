@@ -1,21 +1,65 @@
-version: '3'
+version: '3.6'
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-13}-alpine
+  nginx:
+    build:
+      context: .
+      dockerfile: ./Docker/nginx/Dockerfile
+      cache_from:
+        - nginx:latest
+    hostname: citrus-nginx
+    container_name: citrus-nginx
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMe}
-      POSTGRES_USER: ${POSTGRES_USER:-symfony}
+      - HTTP_PORT=80
+      - APP_NAME=citrus-app
     volumes:
-      - db-data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - .:/app:ro
+    ports:
+      - "8888:80"
+    depends_on:
+      - app
+  app:
+    build:
+      context: .
+      dockerfile: ./Docker/app/Dockerfile
+      cache_from:
+        - php:8.1-fpm
+    hostname: citrus-app
+    container_name: citrus-app
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - app_cache:/var/cache/app
+      - app_log:/var/log/app
+    environment:
+      PHP_IDE_CONFIG: serverName=default
+    depends_on:
+      - mysql
+  mysql:
+    build:
+      context: .
+      dockerfile: ./Docker/mysql/Dockerfile
+      cache_from:
+        - mysql:latest
+    hostname: citrus-mysql
+    container_name: citrus-mysql
+    restart: unless-stopped
+    volumes:
+      - citrus-mysql-data:/var/lib/mysql
+    ports:
+      - "127.0.0.1:3306:3306"
 
 volumes:
-###> doctrine/doctrine-bundle ###
-  db-data:
-###< doctrine/doctrine-bundle ###
+  app_cache:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  app_log:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  citrus-mysql-data:
+  public-data:

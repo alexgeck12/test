@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ReviewRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReviewRepository::class)]
 class Review
@@ -15,15 +16,19 @@ class Review
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+	#[Assert\NotBlank]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT)]
+	#[Assert\NotBlank]
     private ?string $summary = null;
 
     #[ORM\Column(length: 255)]
+	#[Assert\NotBlank]
     private ?string $mpaa_rating = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+	#[Assert\DateTime]
     private ?\DateTimeInterface $publication_date = null;
 
     #[ORM\ManyToOne(inversedBy: 'review')]

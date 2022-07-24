@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\Entity\Critic;
-use App\Repository\CriticRepository;
+use App\Entity\Movie;
+use App\Repository\MovieRepository;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -12,91 +12,87 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class CriticController extends AbstractController
+class MovieController extends AbstractController
 {
-	private CriticRepository $criticRepository;
+	private MovieRepository $movieRepository;
+	private ValidatorInterface $validator;
 
-	public function __construct(CriticRepository $criticRepository, ValidatorInterface $validator)
+	public function __construct(MovieRepository $movieRepository, ValidatorInterface $validator)
 	{
-		$this->criticRepository = $criticRepository;
+		$this->movieRepository = $movieRepository;
 		$this->validator = $validator;
 	}
 	
-    #[Route('/critics/', name: 'add_critic', methods: 'POST')]
+    #[Route('/movies/', name: 'add_movie', methods: 'POST')]
     public function add(Request $request): JsonResponse
     {
 		$data = json_decode($request->getContent(), true);
 
-		$critic = new Critic();
-		$critic->setName($data['name']);
-		$critic->setStatus($data['status']);
-		$critic->setBio($data['bio']);
+		$movie = new Movie();
+		$movie->setName($data['name']);
 
-		$errors = $this->validator->validate($critic);
+		$errors = $this->validator->validate($movie);
 		if (count($errors) > 0) {
 			$errorsString = (string) $errors;
 			return new JsonResponse(['status' => $errorsString], Response::HTTP_BAD_REQUEST);
 		}
 
-		$this->criticRepository->add($critic, true);
+		$this->movieRepository->add($movie, true);
 
-		return new JsonResponse(['status' => 'Critic created!'], Response::HTTP_CREATED);
+		return new JsonResponse(['status' => 'Movie created!'], Response::HTTP_CREATED);
     }
 
-	#[Route('/critics/{id}/', name: 'get_critic', methods: 'GET')]
+	#[Route('/movies/{id}/', name: 'get_movie', methods: 'GET')]
 	public function get($id): JsonResponse
 	{
-		$critic = $this->criticRepository->findOneBy(['id' => $id]);
+		$movie = $this->movieRepository->findOneBy(['id' => $id]);
 
-		if (!empty($critic)) {
+		if (!empty($movie)) {
 			$data = [
-				'id' => $critic->getId(),
-				'name' => $critic->getName(),
-				'bio' => $critic->getBio()
+				'id' => $movie->getId(),
+				'name' => $movie->getName(),
 			];
 			return new JsonResponse($data, Response::HTTP_OK);
 		}
 
-		return new JsonResponse(['status' => 'Critic not found'], Response::HTTP_OK);
+		return new JsonResponse(['status' => 'Movie not found'], Response::HTTP_OK);
 	}
 
-	#[Route('/critics/{id}/update', name: 'update_critic', methods: 'PUT')]
+	#[Route('/movies/{id}/update', name: 'update_movie', methods: 'PUT')]
 	public function update(Request $request, $id): JsonResponse
 	{
-		$critic = $this->criticRepository->findOneBy(['id' => $id]);
+		$movie = $this->movieRepository->findOneBy(['id' => $id]);
 
-		if (empty($critic)) {
-			return new JsonResponse(['status' => 'Critic not found'], Response::HTTP_OK);
+		if (empty($movie)) {
+			return new JsonResponse(['status' => 'Movie not found'], Response::HTTP_OK);
 		}
 
 		$data = json_decode($request->getContent(), true);
 
-		$critic->setName($data['name']);
-		$critic->setStatus($data['status']);
-		$critic->setBio($data['bio']);
+		$movie->setName($data['name']);
 
-		$errors = $this->validator->validate($critic);
+		$errors = $this->validator->validate($movie);
 		if (count($errors) > 0) {
 			$errorsString = (string) $errors;
 			return new JsonResponse(['status' => $errorsString], Response::HTTP_BAD_REQUEST);
 		}
 
-		$this->criticRepository->update($critic, true);
+		$this->movieRepository->update($movie, true);
 
-		return new JsonResponse(['status' => 'Critic updated!'], Response::HTTP_CREATED);
+		return new JsonResponse(['status' => 'Movie updated!'], Response::HTTP_CREATED);
 	}
 
-	#[Route('/critics/{id}/', name: 'delete_critic', methods: 'DELETE')]
+	#[Route('/movies/{id}/', name: 'delete_movie', methods: 'DELETE')]
 	public function delete($id): JsonResponse
 	{
-		$critic = $this->criticRepository->findOneBy(['id' => $id]);
+		$movie = $this->movieRepository->findOneBy(['id' => $id]);
 
-		if (empty($critic)) {
-			return new JsonResponse(['status' => 'Critic not found'], Response::HTTP_OK);
+		if (empty($movie)) {
+			return new JsonResponse(['status' => 'Movie not found'], Response::HTTP_OK);
 		}
 
-		$this->criticRepository->remove($critic, true);
+		$this->movieRepository->remove($movie, true);
 
-		return new JsonResponse(['status' => 'Critic deleted!'], Response::HTTP_CREATED);
+		return new JsonResponse(['status' => 'Movie deleted!'], Response::HTTP_CREATED);
 	}
 }
