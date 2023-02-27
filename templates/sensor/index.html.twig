@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sensors{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="fw-normal my-4">List of sensors
+            <a class="btn btn-sm btn-outline-primary float-end" href="{{ path('app_sensor_create') }}"> Create sensor</a>
+        </h1>
+        <div class="row">
+            <div class="col">
+                {% if sensors|length > 0 %}
+                    <table class="table table-striped">
+                        <tr>
+                            <th>{% trans %}ID{% endtrans %}</th>
+                            <th>{% trans %}IP{% endtrans %}</th>
+                            <th>{% trans %}Actions{% endtrans %}</th>
+                        </tr>
+                        {% for item in sensors %}
+                            <tr>
+                                <td><div>{{ item.id }}</div></td>
+                                <td><div>{{ item.ip }}</div></td>
+                                <td>
+                                    <a href="{{ path('app_sensor_edit', {id:item.id}) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% else %}
+                    <p>Sensors not found</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

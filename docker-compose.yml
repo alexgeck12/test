@@ -1,0 +1,65 @@
+version: "3.9"
+
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: ./Docker/nginx/Dockerfile
+      cache_from:
+        - nginx:latest
+    hostname: eco-nginx
+    container_name: eco-nginx
+    restart: unless-stopped
+    environment:
+      - HTTP_PORT=80
+      - APP_NAME=eco-app
+    volumes:
+      - .:/app:ro
+    ports:
+      - "8888:80"
+    depends_on:
+      - app
+  postgresql:
+    build:
+      context: .
+      dockerfile: ./Docker/postgresql/Dockerfile
+      cache_from:
+        - postgres:15-alpine
+    hostname: eco-postgresql
+    container_name: eco-postgresql
+    restart: unless-stopped
+    volumes:
+      - eco-postgresql-data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+  app:
+    build:
+      context: .
+      dockerfile: ./Docker/app/Dockerfile
+      cache_from:
+        - php:8.1-fpm
+    hostname: eco-app
+    container_name: eco-app
+    restart: unless-stopped
+    volumes:
+      - .:/app
+      - app_cache:/var/cache/app
+      - app_log:/var/log/app
+    environment:
+      PHP_IDE_CONFIG: serverName=default
+    depends_on:
+      - postgresql
+
+volumes:
+  app_cache:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  app_log:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+  eco-postgresql-data:
+  public-data:

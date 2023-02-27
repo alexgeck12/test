@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit sensor{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {{ form_start(form) }}
+        <h1 class="fw-normal my-4">Edit sensor
+            <a href="{{ path('app_sensors')}}" class="btn btn-sm btn-outline-info float-end">Back to list</a>
+            <button class="btn btn-sm btn-outline-primary float-end me-2" type="submit">Submit</button>
+        </h1>
+        <div class="row">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-12 col-lg-4">{{ form_row(form.ip) }}</div>
+                </div>
+            </div>
+        </div>
+        {{ form_end(form) }}
+    </div>
+{% endblock %}
